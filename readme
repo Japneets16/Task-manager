@@ -1,0 +1,222 @@
+## 🧠 Project: **Task Manager API**
+
+**Goal:** Build a RESTful API to manage tasks for authenticated users.
+
+---
+
+### ✅ **PART 1: Project Setup**
+
+### 🎯 Objectives:
+
+- Initialize Node.js project
+- Install required packages
+- Set up basic server
+
+### 📦 Packages:
+
+```bash
+npm init -y
+npm install express mongoose dotenv nodemon
+
+```
+
+### 📁 Structure:
+
+```
+task-manager-api/
+├── config/
+├── controllers/
+├── models/
+├── routes/
+├── middleware/
+├── .env
+├── server.js
+
+```
+
+---
+
+### ✅ **PART 2: Connect MongoDB & Setup Server**
+
+### 🎯 Objectives:
+
+- Create `.env` with `PORT` and `MONGO_URI`
+- Connect to MongoDB using `mongoose`
+- Add test route
+
+```
+mongoose.connect(process.env.MONGO_URI)
+
+```
+
+---
+
+### ✅ **PART 3: User Authentication**
+
+### 🎯 Objectives:
+
+- Create `User` model
+- Add register & login routes
+- Hash passwords with `bcryptjs`
+- Generate JWT on login
+
+### 📦 Extra Packages:
+
+```bash
+npm install bcryptjs jsonwebtoken
+
+```
+
+### Routes:
+
+```bash
+POST /api/auth/register
+POST /api/auth/login
+
+```
+
+---
+
+### ✅ **PART 4: Middleware Setup**
+
+### 🎯 Objectives:
+
+- Create `authMiddleware` to verify JWT
+- Protect task routes so only logged-in users can access
+
+```
+const auth = (req, res, next) => {
+  // Verify JWT and attach user info to request
+};
+
+```
+
+---
+
+### ✅ **PART 5: Task CRUD API**
+
+### 🎯 Objectives:
+
+- Create `Task` model with fields:
+    - title, description, status, dueDate, createdBy
+- Create routes:
+    
+    ```bash
+    POST /api/tasks
+    GET /api/tasks
+    GET /api/tasks/:id
+    PUT /api/tasks/:id
+    DELETE /api/tasks/:id
+    
+    ```
+    
+- Only allow user to access their own tasks
+
+---
+
+### ✅ **PART 6: Filtering, Sorting & Pagination**
+
+### 🎯 Objectives:
+
+- Add query params:
+    - `/api/tasks?status=completed&sort=dueDate&limit=5&page=2`
+- Use `mongoose` filters:
+    
+    ```
+    Task.find({ createdBy: req.user.id, status: req.query.status })
+    
+    ```
+    
+
+---
+
+### ✅ **PART 7: Input Validation**
+
+### 🎯 Objectives:
+
+- Use a library like `express-validator` or `Joi` to validate inputs
+- Prevent missing fields or invalid data
+
+### 📦 Package:
+
+```bash
+npm install express-validator
+
+```
+
+---
+
+### ✅ **PART 8: Rate Limiting & Security**
+
+### 🎯 Objectives:
+
+- Protect the API from abuse
+
+### 📦 Packages:
+
+```bash
+npm install express-rate-limit helmet cors
+
+```
+
+- Use middleware:
+
+```
+app.use(helmet());
+app.use(cors());
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+
+```
+
+---
+
+### ✅ **PART 9: Error Handling & Response Standardization**
+
+### 🎯 Objectives:
+
+- Create a global error handler middleware
+- Use consistent API responses:
+    
+    ```
+    {
+      success: true,
+      data: {...},
+      message: "Task created successfully"
+    }
+    
+    ```
+    
+
+---
+
+### ✅ **PART 10: Testing API Endpoints**
+
+### 🎯 Objectives:
+
+- Use **Postman** or **Thunder Client** to test all endpoints
+- Test:
+    - Auth (Register/Login)
+    - CRUD (Create, Read, Update, Delete)
+    - Filters, Pagination
+
+---
+
+### ✅ **PART 11: Bonus Features**
+
+### 🎯 Ideas:
+
+- Task reminders using `node-cron`
+- Export tasks as CSV or PDF
+- Task priority levels (low/medium/high)
+- Email notification (using `nodemailer`)
+
+---
+
+### ✅ **PART 12: Deploy the API**
+
+---
+
+### 🎯 Objectives:
+
+- Deploy on **Render**, **Vercel (Serverless)**, or **Railway**
+- Use **MongoDB Atlas** for cloud DB
