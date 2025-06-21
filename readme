@@ -1,29 +1,26 @@
-## 🧠 Project: **Task Manager API**
+# 🧠 Task Manager API
 
-**Goal:** Build a RESTful API to manage tasks for authenticated users.
+A **RESTful API** to manage tasks for authenticated users. Built using **Node.js**, **Express.js**, and **MongoDB**, this backend project includes JWT authentication, task management, filtering, sorting, validation, email notifications, and security enhancements.
 
 ---
 
-### ✅ **PART 1: Project Setup**
+## 🎯 Project Goal
 
-### 🎯 Objectives:
+To build a robust and secure backend for managing personal tasks, complete with authentication, advanced query features, and deployment readiness.
 
-- Initialize Node.js project
-- Install required packages
-- Set up basic server
+---
 
-### 📦 Packages:
+## ✅ PART 1: Project Setup
+
+### 📦 Packages
 
 ```bash
 npm init -y
 npm install express mongoose dotenv nodemon
 
-```
+📁 Folder Structure
 
-### 📁 Structure:
-
-```
-task-manager-api/
+task-manager/
 ├── config/
 ├── controllers/
 ├── models/
@@ -32,191 +29,174 @@ task-manager-api/
 ├── .env
 ├── server.js
 
-```
+✅ PART 2: Connect MongoDB & Setup Server
 
----
+    Create .env file and add:
 
-### ✅ **PART 2: Connect MongoDB & Setup Server**
+PORT=3100
+MONGO_URI=your_mongodb_connection_uri
 
-### 🎯 Objectives:
+    Connect to MongoDB:
 
-- Create `.env` with `PORT` and `MONGO_URI`
-- Connect to MongoDB using `mongoose`
-- Add test route
+mongoose.connect(process.env.MONGO_URI);
 
-```
-mongoose.connect(process.env.MONGO_URI)
+    Add a test route to verify server is running.
 
-```
+✅ PART 3: User Authentication
+📦 Extra Packages
 
----
-
-### ✅ **PART 3: User Authentication**
-
-### 🎯 Objectives:
-
-- Create `User` model
-- Add register & login routes
-- Hash passwords with `bcryptjs`
-- Generate JWT on login
-
-### 📦 Extra Packages:
-
-```bash
 npm install bcryptjs jsonwebtoken
 
-```
+Features
 
-### Routes:
+    Register and login users
 
-```bash
+    Hash passwords using bcryptjs
+
+    Generate JWTs on successful login
+
+Routes
+
 POST /api/auth/register
 POST /api/auth/login
 
-```
+✅ PART 4: Middleware Setup
 
----
+Create authMiddleware to verify JWT and protect task routes:
 
-### ✅ **PART 4: Middleware Setup**
-
-### 🎯 Objectives:
-
-- Create `authMiddleware` to verify JWT
-- Protect task routes so only logged-in users can access
-
-```
 const auth = (req, res, next) => {
   // Verify JWT and attach user info to request
 };
 
-```
+✅ PART 5: Task CRUD API
+Task Model Fields
 
----
+    title (String)
 
-### ✅ **PART 5: Task CRUD API**
+    description (String)
 
-### 🎯 Objectives:
+    status (pending/in-progress/completed)
 
-- Create `Task` model with fields:
-    - title, description, status, dueDate, createdBy
-- Create routes:
-    
-    ```bash
-    POST /api/tasks
-    GET /api/tasks
-    GET /api/tasks/:id
-    PUT /api/tasks/:id
-    DELETE /api/tasks/:id
-    
-    ```
-    
-- Only allow user to access their own tasks
+    dueDate (Date)
 
----
+    createdBy (User ID)
 
-### ✅ **PART 6: Filtering, Sorting & Pagination**
+Routes
 
-### 🎯 Objectives:
+POST    /api/tasks
+GET     /api/tasks
+GET     /api/tasks/:id
+PUT     /api/tasks/:id
+DELETE  /api/tasks/:id
 
-- Add query params:
-    - `/api/tasks?status=completed&sort=dueDate&limit=5&page=2`
-- Use `mongoose` filters:
-    
-    ```
-    Task.find({ createdBy: req.user.id, status: req.query.status })
-    
-    ```
-    
+    Only the task creator can view or edit their tasks.
 
----
+✅ PART 6: Filtering, Sorting & Pagination
+Example Query
 
-### ✅ **PART 7: Input Validation**
+GET /api/tasks?status=completed&sort=dueDate&limit=5&page=2
 
-### 🎯 Objectives:
+Mongoose Example
 
-- Use a library like `express-validator` or `Joi` to validate inputs
-- Prevent missing fields or invalid data
+Task.find({ createdBy: req.user.id, status: req.query.status });
 
-### 📦 Package:
+✅ PART 7: Input Validation
+📦 Package
 
-```bash
 npm install express-validator
 
-```
+Validate inputs for required fields, string types, date formats, etc.
+✅ PART 8: Rate Limiting & Security
+📦 Packages
 
----
-
-### ✅ **PART 8: Rate Limiting & Security**
-
-### 🎯 Objectives:
-
-- Protect the API from abuse
-
-### 📦 Packages:
-
-```bash
 npm install express-rate-limit helmet cors
 
-```
+Usage
 
-- Use middleware:
-
-```
 app.use(helmet());
 app.use(cors());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
-```
+✅ PART 9: Error Handling & Response Standardization
+Response Format
 
----
+{
+  "success": true,
+  "data": { ... },
+  "message": "Task created successfully"
+}
 
-### ✅ **PART 9: Error Handling & Response Standardization**
+Add a centralized error handler middleware for consistent error responses.
+✅ PART 10: Testing API Endpoints
 
-### 🎯 Objectives:
+Use Postman or Thunder Client to test:
 
-- Create a global error handler middleware
-- Use consistent API responses:
-    
-    ```
-    {
-      success: true,
-      data: {...},
-      message: "Task created successfully"
-    }
-    
-    ```
-    
+    🔐 Auth: Register/Login
 
----
+    📋 Task CRUD: Create, Read, Update, Delete
 
-### ✅ **PART 10: Testing API Endpoints**
+    🔍 Filters: Status, sorting, pagination
 
-### 🎯 Objectives:
+✅ PART 11: Bonus Features
 
-- Use **Postman** or **Thunder Client** to test all endpoints
-- Test:
-    - Auth (Register/Login)
-    - CRUD (Create, Read, Update, Delete)
-    - Filters, Pagination
+    🧠 Task reminders using node-cron
 
----
+    📤 Export tasks as CSV or PDF
 
-### ✅ **PART 11: Bonus Features**
+    🔺 Priority levels (low, medium, high)
 
-### 🎯 Ideas:
+    ✉️ Email notifications using nodemailer
 
-- Task reminders using `node-cron`
-- Export tasks as CSV or PDF
-- Task priority levels (low/medium/high)
-- Email notification (using `nodemailer`)
+Nodemailer Setup Example
 
----
+EMAIL_USER=your_email@example.com
+EMAIL_PASS=your_password
 
-### ✅ **PART 12: Deploy the API**
+✅ PART 12: Deployment
 
----
+Deploy on Render, Vercel (serverless), or Railway.
 
-### 🎯 Objectives:
+    Use MongoDB Atlas for cloud DB
 
-- Deploy on **Render**, **Vercel (Serverless)**, or **Railway**
-- Use **MongoDB Atlas** for cloud DB
+    Add environment variables to the deployment platform
+
+    Use process.env safely for config
+
+🧪 Run the Project Locally
+
+npm run dev
+# or
+node server.js
+
+Visit: http://localhost:3100
+🤝 Contributing
+
+    Fork the project
+
+    Create your branch (git checkout -b feature/feature-name)
+
+    Commit your changes (git commit -m "Add feature")
+
+    Push to the branch (git push origin feature-name)
+
+    Open a Pull Request
+
+📘 License
+
+Licensed under the MIT License.
+🙌 Acknowledgments
+
+    Express
+
+    MongoDB
+
+    Mongoose
+
+    JWT
+
+    Nodemailer
+
+    bcryptjs
+
+    💻 Created by Japneet Singh
+
