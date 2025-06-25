@@ -2,12 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 
-// Load environment variables if .env file exists
-try {
-  require("dotenv").config();
-} catch (err) {
-  console.log("Note: .env file not found, using default values");
-}
+// Load environment variables
+require("dotenv").config();
 
 require("./models/db");
 require("./models/user");
