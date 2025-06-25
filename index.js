@@ -5,10 +5,13 @@ const app = express();
 // Load environment variables
 require("dotenv").config();
 
-require("./models/db");
-require("./models/user");
-require("./models/task");
-const userroutes = require("./routes/authroutes");
+// Temporarily comment out database models for development
+// require("./models/db");
+// require("./models/user");
+// require("./models/task");
+
+// Use temporary in-memory routes for development
+const userroutes = require("./routes/temp-authroutes");
 
 // Enable CORS for frontend communication
 app.use(
