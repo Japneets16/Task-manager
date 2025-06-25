@@ -1,12 +1,16 @@
 const z = require("zod");
-const { signup } = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/mailer");
 
+// Temporary in-memory storage (for development only)
+let users = [];
+let userIdCounter = 1;
+
 const registeruser = async (req, res) => {
   const body = req.body;
-  //for the validation
+
+  // For validation
   const validate = z.object({
     name: z.string().min(4),
     username: z.string().min(4),
@@ -14,7 +18,7 @@ const registeruser = async (req, res) => {
     password: z.string().max(8),
   });
 
-  //to validate the data with the body that it follows the conditions or not
+  // To validate the data with the body
   const result = validate.safeParse(body);
   if (!result.success) {
     return res.json({
@@ -23,36 +27,37 @@ const registeruser = async (req, res) => {
     });
   }
 
-  //after the validation put the user details in the resul t
+  // After validation
   const { name, username, email, password } = result.data;
 
-  //to find if user exists
-  const existinguser = await signup.findOne({ email });
+  // Check if user exists
+  const existinguser = users.find((user) => user.email === email);
   if (existinguser) {
-    res.status(409).json({
+    return res.status(409).json({
       message: "user already exists",
     });
   }
 
   try {
-    // if the user does not exist then move forward and then hash the password
-    //10 is the rounds the pswrd is hashed
+    // Hash the password
     const hash = await bcrypt.hash(password, 10);
 
-    //create a new user
-    const newuser = new signup({
+    // Create a new user
+    const newuser = {
+      _id: userIdCounter++,
       name,
       username,
       email,
       password: hash,
-    });
-    //save the new user
-    await newuser.save();
+    };
 
-    //secret key for the jwt that is reqd in the jwt
+    // Save the new user to memory
+    users.push(newuser);
+
+    // Secret key for JWT
     const secretkey = process.env.JWT_SECRET || "jpsingh";
 
-    //jwt token are generated
+    // Generate JWT token
     const token = jwt.sign({ id: newuser._id }, secretkey, {
       expiresIn: "24h",
     });
@@ -62,29 +67,30 @@ const registeruser = async (req, res) => {
       token: token,
     });
 
-    //using the nodemailer lib to send the emails to the user from the server after the user is created
+    // Send welcome email (if configured)
     sendEmail(
       email,
       "Welcome to Task Manager",
       `Hi ${name}, welcome to the task manager app. You can now create your tasks and manage them easily. Happy tasking!`,
     );
   } catch (err) {
-    res.status(409).json({
-      message: "server error is there",
+    res.status(500).json({
+      message: "server error",
     });
   }
 };
 
 const loginuser = async (req, res) => {
   const body = req.body;
-  //for the validation
+
+  // For validation
   const validate = z.object({
     email: z.string().email(),
     password: z.string().max(8),
   });
 
-  //to validate the data with the body that it follows the conditions or not
-  const result = await validate.safeParse(body);
+  // Validate data
+  const result = validate.safeParse(body);
   if (!result.success) {
     return res.json({
       message: "validation error",
@@ -92,30 +98,32 @@ const loginuser = async (req, res) => {
     });
   }
 
-  //after the validation put the user details in the result
+  // After validation
   const { email, password } = result.data;
 
-  //o find the user exists then it will go to the sign up to check
-  const existinguser = await signup.findOne({ email });
+  // Find the user
+  const existinguser = users.find((user) => user.email === email);
 
-  //if the user does not exist
+  // If user doesn't exist
   if (!existinguser) {
-    res.status(409).json({
-      message: "user does not exit create a new user ",
+    return res.status(409).json({
+      message: "user does not exist, create a new user",
     });
   }
 
-  //now compare the passwords with the existing user password
+  // Compare passwords
   bcrypt.compare(password, existinguser.password, (err, result) => {
     if (err) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "server error",
       });
     }
+
     if (result) {
-      //secret key for the jwt that is reqd in the jwt
+      // Secret key for JWT
       const secretkey = process.env.JWT_SECRET || "jpsingh";
-      //jwt token are generated
+
+      // Generate JWT token
       const token = jwt.sign({ id: existinguser._id }, secretkey, {
         expiresIn: "24h",
       });
