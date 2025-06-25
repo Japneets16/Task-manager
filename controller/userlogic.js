@@ -50,7 +50,7 @@ const registeruser = async (req, res) => {
     await newuser.save();
 
     //secret key for the jwt that is reqd in the jwt
-    const secretkey = "jpsingh";
+    const secretkey = process.env.JWT_SECRET || "jpsingh";
 
     //jwt token are generated
     const token = jwt.sign({ id: newuser._id }, secretkey, {
@@ -114,7 +114,7 @@ const loginuser = async (req, res) => {
     }
     if (result) {
       //secret key for the jwt that is reqd in the jwt
-      const secretkey = "jpsingh";
+      const secretkey = process.env.JWT_SECRET || "jpsingh";
       //jwt token are generated
       const token = jwt.sign({ id: existinguser._id }, secretkey, {
         expiresIn: "24h",
