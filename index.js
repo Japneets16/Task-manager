@@ -31,6 +31,15 @@ app.get("/", (req, res) => {
   });
 });
 
+// Test endpoint for frontend connection
+app.post("/api/test", (req, res) => {
+  res.json({
+    message: "Frontend and Backend are connected!",
+    receivedData: req.body,
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // API routes
 app.use("/api/auth", userroutes);
 
